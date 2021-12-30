@@ -6,10 +6,11 @@ __lua__
 hash=stat(6) --get string from js
 s=1 --init seed
 for i=1,#hash do -- for each char in hash
- ch=ord(sub(hash,i,i))s+=s*31+ch
+ ch=ord(sub(hash,i,i))s+=s*31+ch -- convert char to number
 end 
-srand(s)
+srand(s) -- seed the rng
 
+-- playing with seeds for debug
 --s=rnd(-1)\1
 --s=29699
 --s=-12362 
@@ -17,12 +18,12 @@ srand(s)
 
 -- setup starts here
 _set_fps(60)
-cls()
+cls()  -- clear the screen
 num_circles = flr(rnd(4)+1)
---print(num_circles)
 
 srand(s)
 
+-- single pixel dither approach
 function pix_dither(x,y,r,c)
 	pset(
 	x-1+rnd(2),
@@ -31,6 +32,7 @@ function pix_dither(x,y,r,c)
 	)
 end
 
+-- cicle based dither
 function circ_dither(x,y,r,c)
 	circ(
 	x-1+rnd(2),
@@ -39,6 +41,7 @@ function circ_dither(x,y,r,c)
 	c)
 end
 
+-- rectangle based dither
 function sqr_dither(x,y,r,c)
 	rect(
 	x-r+rnd({-1,1}),
@@ -48,6 +51,7 @@ function sqr_dither(x,y,r,c)
 	c)
 end
 
+-- character based dither
 function p8scii_dither(x,y,r,c)
  print(
   "\^p"..chr(rnd(240)\1+16),
@@ -57,6 +61,7 @@ function p8scii_dither(x,y,r,c)
 	)
 end
 
+-- select which dither to use
 dither = rnd({
  pix_dither,
  circ_dither,
@@ -64,10 +69,7 @@ dither = rnd({
  p8scii_dither
 })
 
-d_circ_r = rnd({
- 1
-})
-
+-- change the palette
 pal({
  1,-14,-11,13,
  -3,2,-2,-7,
@@ -75,10 +77,12 @@ pal({
  1,-15,0
 },1)
 
+-- how many times to dither
 dither_loops = rnd(4901)+100
 
 ::😐:: -- draw loop start
 
+-- draw some circles
 for i=0,num_circles do
 	local r=rnd(16)
 	local x=rnd(40)+40
@@ -86,17 +90,22 @@ for i=0,num_circles do
  circ(x,y,r,rnd({13,14,15}))
 end
 
+-- call the dither function
 for i=0,dither_loops do
 	local x=rnd(128)
 	local y=rnd(128)
 	local c=max(pget(x,y)-1,0)
-	dither(x,y,d_circ_r,c)
+	dither(x,y,1,c)
 end
 
-
+-- do a seed loop
 if(rnd()>.9)srand(s)
 
+-- debug print seed
 --?s,0,0,7
+
+-- force draw to screen
 flip()
+
 goto 😐 -- draw loop end
 
